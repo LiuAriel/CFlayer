@@ -3,6 +3,8 @@ CFlayer:  Media play library based on c/c++ and FFmpeg
 
 Currently Player version 1.1.1, also uploaded a bin file, you can test it! 
 
+CFlayer operating platform: win7 above operating system。
+
 If you start a pop-up error message, install the bin folder inside the VS2013 runtime library (vcredist_x86_2013.exe) can be!
 
 User Instructions:                                                                                                              
