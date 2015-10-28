@@ -1,5 +1,6 @@
 # CFlayer
 CFlayer：媒体播放库基于C/C++11和FFmpeg（2.1.3版本）
+目前除了UI，视频渲染部分，还有log日志依赖qt之外，后续版本会陆续将log和渲染分开qt！
 
 播放器也刚刚开始做，基本上就是能正常播放视频；release文件夹提供player.exe文件；
 
