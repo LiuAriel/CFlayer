@@ -60,6 +60,7 @@ bool CCDecodeVideo::decode(const ByteArray& encoded)
 	if (!is_available())
 		return false;
 	DPTR_D(CCDecodeVideo);
+
 	std::unique_ptr<AVPacket, std::function<void(AVPacket*)>> packet(
 		new AVPacket, [](AVPacket* p){ av_free_packet(p); delete p; });
 	av_new_packet(packet.get(), encoded.size());
