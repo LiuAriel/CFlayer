@@ -7,7 +7,7 @@ CFlayer（又名CCAV）：媒体播放库基于C/C++11和FFmpeg（2.1.3版本）
 CFlayer操作平台：暂时只提供WIN7以上操作系统测试文件。
 
 如果你开始弹出（error_pic_one、error_pic_two、error_pic_three）图片错误信息提示，
-安装bin文件夹VS2013运行时库（vcredist_x86_2013.exe）即可！
+安装bin文件夹VS2013运行时库（vcredist_x86_2013.exe）即可（目前必须保证机器有音频播放设备，否则不能播放）！
 
 使用说明：                                                                                                                   
 按“M”静音;                                                                                                                  
