@@ -37,7 +37,7 @@ bool EventFilter::eventFilter(QObject *watched, QEvent *event)
 {
   
     Q_UNUSED(watched);
-   
+	
     QEvent::Type type = event->type();
     switch (type) {
     case QEvent::MouseButtonPress:
@@ -49,17 +49,23 @@ bool EventFilter::eventFilter(QObject *watched, QEvent *event)
        
         int key = static_cast<QKeyEvent*>(event)->key();
         switch (key) {
-        case Qt::Key_N: 
+		case Qt::Key_N:
+		{
 			player->func_play_next_frame = std::bind(&CCPlayer::play_next_frame, player);
 			player->func_play_next_frame();
+		}
             break;
-        case Qt::Key_P:
+		case Qt::Key_P:
+		{
 			player->func_play = std::bind(&CCPlayer::plays, player);
-			player->func_play();           
+			player->func_play();
+		}	           
             break;
-        case Qt::Key_S:
+		case Qt::Key_S:
+		{
 			player->func_stop_data = std::bind(&CCPlayer::stop_datas, player);
 			player->func_stop_data();
+		}	
             break;
 		case Qt::Key_Space:
 		{
@@ -80,27 +86,38 @@ bool EventFilter::eventFilter(QObject *watched, QEvent *event)
             break;
         case Qt::Key_Up:
             if (player->audio) {
-                double v = player->audio->volume();
-                if (v > 0.5)
+
+				player->func_volume = std::bind(&CCPlayer::volume, player);
+				double v = player->func_volume();
+
+				if (v > 0.5)
                     v += 0.1;
                 else if (v > 0.1)
                     v += 0.05;
                 else
                     v += 0.025;
-                player->audio->set_volume(v);
+
+				player->func_set_volume = std::bind(&CCPlayer::set_volume, player, std::placeholders::_1);
+				player->func_set_volume(v);
                 qDebug("vol = %.3f", player->audio->volume());
             }
             break;
         case Qt::Key_Down:
             if (player->audio) {
-                double v = player->audio->volume();
+
+				player->func_volume = std::bind(&CCPlayer::volume, player);
+				double v = player->func_volume();
+
                 if (v > 0.5)
                     v -= 0.1;
                 else if (v > 0.1)
                     v -= 0.05;
                 else
                     v -= 0.025;
-                player->audio->set_volume(v);
+
+				player->func_set_volume = std::bind(&CCPlayer::set_volume, player, std::placeholders::_1);
+				player->func_set_volume(v);
+
                 qDebug("vol = %.3f", player->audio->volume());
             }
             break;
@@ -124,7 +141,8 @@ bool EventFilter::eventFilter(QObject *watched, QEvent *event)
             break;
         case Qt::Key_M:
             if (player->audio) {
-                player->audio->set_mute(!player->audio->is_mute());
+				player->func_set_mute = std::bind(&CCPlayer::set_mute, player, std::placeholders::_1);
+				player->func_set_mute(!player->is_mute());
             }
             break;
         case Qt::Key_T: {

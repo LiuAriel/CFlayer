@@ -82,6 +82,7 @@ CCPlayer::CCPlayer(QObject *parent) :
     demuxer_thread->set_video_thread(video_thread);
 
     event_filter = new EventFilter(this);
+
 }
 
 CCPlayer::~CCPlayer()
@@ -117,6 +118,19 @@ void CCPlayer::set_renderers(CCVideoRenderer *r)
     renderer->registerEventFilter(event_filter);
     video_thread->set_output(renderer);
     renderer->resize_video(renderer->video_sizes()); 
+}
+
+void CCPlayer::set_volume(double vol)
+{
+	if (audio)
+	{
+		audio->set_volume(vol);
+	}
+}
+
+double CCPlayer::volume() const
+{
+	return audio->volume();
 }
 
 void CCPlayer::set_mute(bool mute)
