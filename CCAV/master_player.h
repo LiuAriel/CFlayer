@@ -27,7 +27,6 @@
 #include <functional>
 
 namespace CCAV {
-
 class CCOutputAudio;
 class CCAudioThread;
 class CCVideoThread;
@@ -66,6 +65,8 @@ public:
 	void stop_datas();
 	bool is_plays() const;
 	void demultiplexstop();
+	void set_volume(double vol);
+	double  volume() const;
 public slots:
     void plays(); //replay
     void play_next_frame();
@@ -115,6 +116,9 @@ public:
 	std::function<void(double)> func_seek;
 	std::function<void(bool)> func_pauses;
 	std::function<bool(QString)> func_open_file;
+	std::function<void(double)> func_set_volume;
+	std::function<double()> func_volume;
+	std::function<void(bool)> func_set_mute;
 };
 
 } //namespace CCAV

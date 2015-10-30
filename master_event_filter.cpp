@@ -26,6 +26,7 @@
 #include <CCAV/master_player.h>
 #include <CCAV/output_audio.h>
 #include <functional>
+
 namespace CCAV {
 
 EventFilter::EventFilter(CCPlayer *parent) :
