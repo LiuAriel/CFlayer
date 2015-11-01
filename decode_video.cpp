@@ -60,10 +60,10 @@ bool CCDecodeVideo::decode(const ByteArray& encoded)
 	if (!is_available())
 		return false;
 	DPTR_D(CCDecodeVideo);
-
 	std::unique_ptr<AVPacket, std::function<void(AVPacket*)>> packet(
 		new AVPacket, [](AVPacket* p){ av_free_packet(p); delete p; });
 	av_new_packet(packet.get(), encoded.size());
+	//av_init_packet(packet.get());
 	memcpy(packet->data, encoded.data(), encoded.size());
 
 	int ret = avcodec_decode_video2(d.codec_ctx, d.frame, &d.got_frame_ptr, packet.get());
@@ -85,7 +85,17 @@ bool CCDecodeVideo::decode(const ByteArray& encoded)
 	
 	d.conv->set_in_format(d.codec_ctx->pix_fmt);
 	d.conv->set_in_size(d.codec_ctx->width, d.codec_ctx->height);
-	d.conv->convert(d.frame->data, d.frame->linesize);
+	if (d.width <= 0 || d.height <= 0) {
+		qDebug("decoded video size not seted. use original size [%d x %d]"
+			, d.codec_ctx->width, d.codec_ctx->height);
+		if (!d.codec_ctx->width || !d.codec_ctx->height)
+			return false;
+		resize_video(d.codec_ctx->width, d.codec_ctx->height);
+	}
+
+	if (!d.conv->convert(d.frame->data, d.frame->linesize))
+		return false;
+
 	d.decoded_video = d.conv->out_data();
 	return true;
 }

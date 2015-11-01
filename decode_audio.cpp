@@ -40,10 +40,20 @@ bool CCDecodeAudio::decode(const ByteArray& encoded)
 	if (!is_available())
 		return false;
 	DPTR_D(CCDecodeAudio);
-	
+	//AVPacket packet;
+	/*av_new_packet(&packet, encoded.size());
+	memcpy(packet.data, encoded.data(), encoded.size());
+	int ret = avcodec_decode_audio4(d.codec_ctx, d.frame, &d.got_frame_ptr, &packet);
+	av_free_packet(&packet);*/
 	std::unique_ptr<AVPacket, std::function<void(AVPacket*)>> packet(
 		new AVPacket, [](AVPacket* p){ av_free_packet(p); delete p; });
+	if (encoded.size() == 1)
+	{
+		return false;
+	}
 	av_new_packet(packet.get(), encoded.size());
+	//av_init_packet(packet.get());
+	
 	memcpy(packet->data, encoded.data(), encoded.size());
 
 	int ret = avcodec_decode_audio4(d.codec_ctx, d.frame, &d.got_frame_ptr, packet.get());
