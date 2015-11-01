@@ -54,9 +54,10 @@ void CCAudioThread::run_audio()
 		return;
 	reset_state();
 	assert(d.clock != 0);
+	CCDecodeAudio *dec = static_cast<CCDecodeAudio*>(d.dec);
 	CCOutputAudio *ao = static_cast<CCOutputAudio*>(d.writer);
-	int sample_rate = d.dec->codec_context()->sample_rate;
-	int channels = d.dec->codec_context()->channels;
+	int sample_rate = dec->codec_context()->sample_rate;
+	int channels = dec->codec_context()->channels;
 	int csf = channels * sample_rate * sizeof(float);
 	static const double max_len = 0.02;
 	d.last_pts = 0;
@@ -76,8 +77,9 @@ void CCAudioThread::run_audio()
 
 		PacketData pkt;
 		d.packets.pop(pkt); 
-		if (pkt.date.isEmpty()) {
+		if (pkt.pts <= 0 || pkt.date.isEmpty()) {
 			qDebug("Empty packet!");
+			dec->flush_codec();
 			continue;
 		}
 		d.clock->update_value(pkt.pts);

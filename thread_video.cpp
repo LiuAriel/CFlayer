@@ -106,8 +106,9 @@ void CCVideoThread::run_video()
 		PacketData pkt;
 		d.packets.pop(pkt); 
 		
-		if (pkt.pts <= 0 || pkt.date.isEmpty()) {
+		if (!pkt.is_valid()) {
 			qDebug("Invalid pts or empty packet!");
+			dec->flush_codec();
 			continue;
 		}
 		d.delay = pkt.pts - d.clock->value();
@@ -132,18 +133,34 @@ void CCVideoThread::run_video()
 
 		d.clock->update_video_pts(pkt.pts); 
 
+		bool vo_ok = vo && vo->is_available();
+		if (vo_ok) {
+			
+			if (vo->last_width() > 0 && vo->last_height() > 0 && !vo->scale_in())
+				dec->resize_video(vo->last_size());
+			else
+				vo->set_source_size(dec->width(), dec->height()); //setLastSize()
+		}
+
 		ByteArray da(pkt.date);
 		if (d.dec->decode(da)) {
 			d.pts = pkt.pts;
-			d.width = dec->width();
+			d.decoded_datas = d.dec->data_video();
+			if (vo_ok) {
+				vo->write_data(d.decoded_datas);
+			}
+			/*d.width = dec->width();
 			d.height = dec->height();
 			d.decoded_datas = d.dec->data_video();
 
 			if (vo && vo->is_available()) {
 				vo->set_source_size(dec->width(), dec->height());
 				vo->write_data(d.decoded_datas);
-			}
+			}*/
 		}
+
+		if (vo_ok && !vo->scale_in())
+			vo->set_source_size(vo->video_sizes());
 	}
 	qDebug("Video thread stops running...");
 }
