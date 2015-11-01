@@ -36,7 +36,7 @@ public:
     explicit CCWidgetRenderer(QWidget *parent = 0, Qt::WindowFlags f = 0);
     virtual ~CCWidgetRenderer();
 
-    virtual void registerEventFilter(EventFilter *filter);
+    //virtual void registerEventFilter(EventFilter *filter);
 	virtual bool write() override;
     void set_preview(const QImage& preivew);
 

@@ -27,6 +27,7 @@
 #include <functional>
 
 namespace CCAV {
+
 class CCOutputAudio;
 class CCAudioThread;
 class CCVideoThread;
@@ -47,15 +48,20 @@ public:
     CCClock* master_clocks();
     void set_files(const QString& path);
 	QString file() const;
-   
+	bool load(const QString& path);
+	bool load();
+	bool is_loaded() const;
+
     void set_capture_name(const std::string& name);
     void set_capture_savedir(const std::string& dir); 
     bool capture_video();
     bool play(const QString& path);
     void pauses(bool p);
     bool is_paused() const;
-    void set_renderers(CCVideoRenderer* renderer);
-
+    //void set_renderers(CCVideoRenderer* renderer);
+	CCVideoRenderer* set_renderers(CCVideoRenderer* renderer);
+	CCVideoRenderer* renderers();
+	CCOutputAudio* audios();
     void set_mute(bool mute);
     bool is_mute() const;
 	int  tests(int a);
@@ -72,17 +78,18 @@ public slots:
     void play_next_frame();
     void seek_forward();
     void seek_backward();
+	void seek(double pos);
 
 protected slots:
     void resize_video(const QSize& size);
 
 protected:
-	int avTimerId;
+	bool loaded;
     AVFormatContext	*formatCtx; 
     AVCodecContext *aCodecCtx, *vCodecCtx; 
     QString path;
     std::string capture_name, capture_dir;
-    int m_drop_count;
+    //int m_drop_count;
     CCDemuxer demuxer;
     CCDemuxerThread *demuxer_thread;
     CCClock *clock;

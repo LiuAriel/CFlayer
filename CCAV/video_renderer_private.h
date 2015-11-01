@@ -21,6 +21,7 @@
 
 #include <private/master_output_private.h>
 #include <CCAV/compat_common.h>
+#include <mutex>
 
 namespace CCAV {
 
@@ -28,13 +29,15 @@ class EventFilter;
 class Q_EXPORT CCVideoRendererPrivate : public CCOutputPrivate
 {
 public:
-    CCVideoRendererPrivate():width(480),height(320),src_width(0)
+	CCVideoRendererPrivate() :scale_in(true),width(480), height(320), src_width(0)
       ,src_height(0),event_filter(0) {
     }
     virtual ~CCVideoRendererPrivate(){}
     int width, height;
     int src_width, src_height;
     EventFilter *event_filter;
+	std::mutex mutex_;
+	bool scale_in;
 };
 
 } //namespace CCAV

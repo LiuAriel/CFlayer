@@ -63,9 +63,7 @@ public:
     bool initialized;
     PaStreamParameters *outputParameters;
     PaStream *stream;
-#ifdef Q_OS_LINUX
-    bool autoFindMultichannelDevice;
-#endif
+
     double outputLatency;
 };
 

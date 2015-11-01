@@ -40,24 +40,24 @@ public:
 
     CCClock(ClockType c);
     CCClock();
+
     void set_clock_type(ClockType ct);
     ClockType clock_types() const;
     void set_clock_auto(bool a);
     bool is_clock_auto() const;
+	bool is_active() const;
     inline double pts() const;
     inline double value() const; 
     inline void update_value(double pts);
-   
-    void update_external_clock(long long msecs); 
-
     inline void update_video_pts(double pts);
     inline double video_pts() const;
     inline double delay() const; 
     inline void update_delay(double delay);
 
+	void update_external_clock(long long msecs);
     void pause(bool p);
     void reset();
-
+	
 private:
     bool auto_clock;
     ClockType clock_type;
@@ -66,6 +66,7 @@ private:
     double delay_;
 };
 
+//auto lambda = [](){return 0.05; };
 double CCClock::value() const
 {
     if (clock_type == AudioClock) {
@@ -79,8 +80,10 @@ double CCClock::value() const
 
 void CCClock::update_value(double pts)
 {
-    if (clock_type == AudioClock)
-        pts_ = pts;
+	if (clock_type == AudioClock)
+	{
+		pts_ = pts;
+	}
 }
 
 void CCClock::update_video_pts(double pts)

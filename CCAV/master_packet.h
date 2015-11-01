@@ -30,9 +30,15 @@ class Q_EXPORT PacketData
 {
 public:
     PacketData();
+	inline bool is_valid() const;
     double pts, duration;
 	ByteArray date;
 };
+
+bool PacketData::is_valid() const
+{
+	return  pts >= 0 && duration >= 0/* || !date.isEmpty()*/; //!data.isEmpty()?
+}
 
 using packet_queue = QueueBlocking<PacketData>;
 

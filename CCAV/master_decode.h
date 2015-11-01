@@ -38,6 +38,8 @@ public:
     virtual ~CCDevoder();
     void set_codec_context(AVCodecContext* codecCtx); 
     AVCodecContext* codec_context() const;
+
+	void flush_codec();
     
     bool is_available() const;
 	virtual bool decode(const ByteArray& encoded) = 0;

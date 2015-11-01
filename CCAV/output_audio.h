@@ -39,7 +39,8 @@ public:
 
     void set_volume(double volume);
     double volume() const;
-    void set_mute(bool yes);
+
+    void set_mute(bool mute);
     bool is_mute() const;
 
 protected:

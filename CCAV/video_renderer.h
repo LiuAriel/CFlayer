@@ -35,7 +35,15 @@ class Q_EXPORT CCVideoRenderer : public CCOutput
 public:
     CCVideoRenderer();
     virtual ~CCVideoRenderer() = 0;
-    void set_source_size(int width, int height);
+
+	void scale_in(bool q);
+	bool scale_in() const;	
+	void set_source_size(const QSize& s); 
+	void set_source_size(int width, int height); 
+	QSize last_size() const;
+	int last_width() const;
+	int last_height() const;
+
     virtual void registerEventFilter(EventFilter* filter);
     virtual bool open() override;
     virtual bool close() override;

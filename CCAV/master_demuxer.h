@@ -86,14 +86,15 @@ public:
 
     void started();
     void finished(); 
-	bool started_;
+
+	std::atomic<bool> started_;
 private:
-   // bool started_;
+    
     bool eof;
     PacketData *pkt;
     long long ipts;
     int stream_idx;
-	mutable /*int*/std::atomic<int> audio_stream, video_stream, subtitle_stream;
+	mutable std::atomic<int> audio_stream, video_stream, subtitle_stream;
 
     bool find_codec();
     std::string format_name(AVFormatContext *ctx, bool longName = false) const;

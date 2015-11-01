@@ -20,7 +20,7 @@
 #ifndef CCAV_BLOCKINGQUEUE_H
 #define CCAV_BLOCKINGQUEUE_H
 
-#include <queue>
+#include <queue>//deque
 #include <condition_variable>
 #include <memory>
 #include <mutex>
@@ -62,7 +62,7 @@ namespace CCAV {
 
 	template <typename T>
 	QueueBlocking<T>::QueueBlocking()
-		:block_empty_(true), block_full_(true), cap(384), thres(128)
+		:block_empty_(true), block_full_(true), cap(1024), thres(128)
 	{
 	}
 

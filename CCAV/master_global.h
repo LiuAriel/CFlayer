@@ -26,7 +26,7 @@
 
 #define CCAV_MAJOR 1	//((CCAV_VERSION&0xff0000)>>16)
 #define CCAV_MINOR 1	//((CCAV_VERSION&0xff00)>>8)
-#define CCAV_PATCH 1	//(CCAV_VERSION&0xff)
+#define CCAV_PATCH 2	//(CCAV_VERSION&0xff)
 
 #define CCAV_VERSION_CHK(major, minor, patch) \
     (((major&0xff)<<16) | ((minor&0xff)<<8) | (patch&0xff))

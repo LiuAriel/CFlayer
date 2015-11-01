@@ -30,8 +30,8 @@ class EventFilter : public QObject
     Q_OBJECT
 public:
     explicit EventFilter(CCPlayer *parent = 0);
-
-    bool filterEvent(QEvent *e);
+	virtual ~EventFilter();
+    
 protected:
     virtual bool eventFilter(QObject *, QEvent *);
 

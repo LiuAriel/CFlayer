@@ -41,7 +41,7 @@ public:
 
     bool paused;
     bool demux_end;
-    volatile bool stop; 
+	volatile std::atomic<bool> stop;
     CCClock *clock;
     packet_queue packets;
     CCDevoder *dec;

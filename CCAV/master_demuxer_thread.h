@@ -23,6 +23,7 @@
 #include <condition_variable>
 #include <memory>
 #include <mutex>
+#include "util.h"
 namespace CCAV {
 
 class CCDemuxer;
@@ -40,16 +41,15 @@ public:
     void seek_backward();
     bool is_paused() const;
 	void run_demuxer();
-	void runDemuxer();
     void stop();
     void pause(bool p);
-	void runEnd();
+	void run_end();
 protected:
     bool try_pause();
 
 private:
     bool paused;
-    volatile bool end, end_;
+	volatile std::atomic<bool> end, end_;
     CCDemuxer *demuxer;
     CCThread *audio_thread, *video_thread;
     int audio_stream, video_stream;

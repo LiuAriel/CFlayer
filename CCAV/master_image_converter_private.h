@@ -22,13 +22,18 @@
 
 #include <CCAV/master_global.h>
 #include "master_array.h"
+#include <CCAV/compat_common.h>
+#define PIX_FMT PIX_FMT_RGB32 //PIX_FMT_YUV420P
+
 namespace CCAV {
 
 class CCImageConverter;
 class Q_EXPORT CCImageConverterPrivate : public DPtrPrivate<CCImageConverter>
 {
 public:
-	CCImageConverterPrivate() :interlaced(false), data_outs(10, 'c'){}
+	CCImageConverterPrivate() :interlaced(false), data_outs(10, 'c'), w_in(0), h_in(0), w_out(0), h_out(0)
+		, fmt_in(PIX_FMT_YUV420P), fmt_out(PIX_FMT_RGB32)
+	{}
     bool interlaced;
     int w_in, h_in, w_out, h_out;
     int fmt_in, fmt_out;
