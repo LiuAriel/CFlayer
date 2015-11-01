@@ -57,13 +57,13 @@ int CCOutputAudio::channels() const
 void CCOutputAudio::set_volume(double volume)
 {
     DPTR_D(CCOutputAudio);
-    d.vol = qMax<double>(volume, 0);
+    d.vol = std::max<double>(volume, 0);
     d.mute = d.vol == 0;
 }
 
 double CCOutputAudio::volume() const
 {
-    return qMax<double>(d_func().vol, 0);
+	return std::max<double>(d_func().vol, 0);
 }
 
 void CCOutputAudio::set_mute(bool yes)
@@ -73,7 +73,7 @@ void CCOutputAudio::set_mute(bool yes)
 
 bool CCOutputAudio::is_mute() const
 {
-    return d_func().mute;
+	return !is_available() || d_func().mute;
 }
 
 void CCOutputAudio::convert_data(const ByteArray &data)

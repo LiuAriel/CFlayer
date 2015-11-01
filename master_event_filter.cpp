@@ -26,12 +26,16 @@
 #include <CCAV/master_player.h>
 #include <CCAV/output_audio.h>
 #include <functional>
-
 namespace CCAV {
 
 EventFilter::EventFilter(CCPlayer *parent) :
     QObject(parent),player(parent)
 {
+}
+
+EventFilter::~EventFilter()
+{
+
 }
 
 bool EventFilter::eventFilter(QObject *watched, QEvent *event)

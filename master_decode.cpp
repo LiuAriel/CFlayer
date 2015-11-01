@@ -34,6 +34,13 @@ CCDevoder::~CCDevoder()
 {
 }
 
+void CCDevoder::flush_codec()
+{
+	if (is_available())
+		avcodec_flush_buffers(d_func().codec_ctx);
+}
+
+
 void CCDevoder::set_codec_context(AVCodecContext *codecCtx)
 {
     DPTR_D(CCDevoder);

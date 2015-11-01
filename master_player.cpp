@@ -35,7 +35,6 @@
 #include <CCAV/thread_video.h>
 #include <CCAV/master_demuxer_thread.h>
 #include <CCAV/master_event_filter.h>
-
 #if HAVE_PORTAUDIO
 #include <CCAV/port_audio.h>
 #endif //HAVE_PORTAUDIO
@@ -54,7 +53,7 @@ using std::thread;
 namespace CCAV {
 
 CCPlayer::CCPlayer(QObject *parent) :
-	QObject(parent),capture_dir("capture"),renderer(0),audio(0)
+QObject(parent), capture_dir("capture"), renderer(0), audio(0), loaded(false)
 	, event_filter(0), is_audio(false), is_video(false), is_demuxer(false), is_demuxer_stop(false)
 {
     qDebug("CCVA %s\nCopyright (C) 2015 Juno<junowendy@gmail.com>"
@@ -109,16 +108,29 @@ CCClock* CCPlayer::master_clocks()
     return clock;
 }
 
-void CCPlayer::set_renderers(CCVideoRenderer *r)
+CCVideoRenderer* CCPlayer::set_renderers(CCVideoRenderer *r)
 {
+	CCVideoRenderer *vr = renderer;
+	renderer = r;
+	video_thread->set_output(renderer);
     if (renderer) {
 		if (is_plays())
 			stop_datas();
+
+		renderer->registerEventFilter(event_filter);
+		renderer->resize_video(renderer->video_sizes());
     }
-    renderer = r;
-    renderer->registerEventFilter(event_filter);
-    video_thread->set_output(renderer);
-    renderer->resize_video(renderer->video_sizes()); 
+	return vr;
+}
+
+CCVideoRenderer *CCPlayer::renderers()
+{
+	return renderer;
+}
+
+CCOutputAudio* CCPlayer::audios()
+{
+	return audio;
 }
 
 void CCPlayer::set_volume(double vol)
@@ -204,43 +216,90 @@ int CCPlayer::tests(int a)
 	return a;
 }
 
+bool CCPlayer::is_loaded() const
+{
+	return loaded;
+}
+
+bool CCPlayer::load(const QString &path)
+{
+	set_files(path);
+	return load();
+}
+
+bool CCPlayer::load()
+{
+	loaded = false;
+	if (path.isEmpty()) {
+		qDebug("No file to play...");
+		return loaded;
+	}
+	qDebug("loading: %s ...", path.toUtf8().constData());
+	if (!demuxer.load_file(path)) {
+		return loaded;
+	}
+	loaded = true;
+	demuxer.dump();
+	formatCtx = demuxer.format_contexts();
+	aCodecCtx = demuxer.audio_codec_context();
+	vCodecCtx = demuxer.video_codec_context();
+	if (audio && aCodecCtx) {
+		audio->set_sample_rate(aCodecCtx->sample_rate);
+		audio->set_channels(aCodecCtx->channels);
+		if (!audio->open()) {
+			//return; //audio not ready
+		}
+	}
+	audio_dec->set_codec_context(aCodecCtx);
+	video_dec->set_codec_context(vCodecCtx);
+	return loaded;
+}
+
 void CCPlayer::plays()
 {
-    if (path.isEmpty()) {
-		qDebug("No file to play...");
-		return;
-	}
+//     if (path.isEmpty()) {
+// 		qDebug("No file to play...");
+// 		return;
+// 	}
 	if (is_plays())
 	{
 		stop_datas();
 	}
-    qDebug("loading: %s ...", path);
-    if (!demuxer.load_file(path)) {
-        return;
+
+	if (!is_loaded()) { //if (!isLoaded() && !load())
+		if (!load())
+			return;
 	}
-    demuxer.dump();
+	else {
+		demuxer.seek(0); //FIXME: now assume it is seekable. for unseekable, setFile() again
+	}
+//     qDebug("loading: %s ...", path);
+//     if (!demuxer.load_file(path)) {
+//         return;
+// 	}
+//     demuxer.dump();
 	assert(clock != 0);
     clock->reset();
-    formatCtx = demuxer.format_contexts();
-    vCodecCtx = demuxer.video_codec_context();
-    aCodecCtx = demuxer.audio_codec_context();
-    if (audio && aCodecCtx) {
-        audio->set_sample_rate(aCodecCtx->sample_rate);
-        audio->set_channels(aCodecCtx->channels);
-        if (!audio->open())
-            return;
-    }
+//     formatCtx = demuxer.format_contexts();
+//     vCodecCtx = demuxer.video_codec_context();
+//     aCodecCtx = demuxer.audio_codec_context();
+//     if (audio && aCodecCtx) {
+//         audio->set_sample_rate(aCodecCtx->sample_rate);
+//         audio->set_channels(aCodecCtx->channels);
+//         if (!audio->open())
+//             return;
+//     }
 
-    m_drop_count = 0;
+    //m_drop_count = 0;
 
-    audio_dec->set_codec_context(aCodecCtx);
+   // audio_dec->set_codec_context(aCodecCtx);
     if (aCodecCtx) {
         qDebug("Starting audio thread...");
 		is_audio = true;
 		thread_audio = std::thread(&CCPlayer::decode_audio, this);
     }
 
-    video_dec->set_codec_context(vCodecCtx);
+   // video_dec->set_codec_context(vCodecCtx);
     if (vCodecCtx) {
         qDebug("Starting video thread...");
 		is_video = true;
@@ -266,12 +325,12 @@ void CCPlayer::decode_video()
 
 void CCPlayer::demultiplex()
 {
-	demuxer_thread->runDemuxer();
+	demuxer_thread->run_demuxer();
 }
 
 void CCPlayer::demultiplexstop()
 {
-	demuxer_thread->runEnd();
+	demuxer_thread->run_end();
 }
 
 void CCPlayer::stop_datas()
@@ -294,6 +353,8 @@ void CCPlayer::stop_datas()
 	if (thread_demuxer_stop.joinable()) {
 		thread_demuxer_stop.join();
 	}
+
+	loaded = false;
 }
 
 //FIXME: If not playing, it will just play but not play one frame.
@@ -315,6 +376,11 @@ void CCPlayer::seek_forward()
 void CCPlayer::seek_backward()
 {
     demuxer_thread->seek_backward();
+}
+
+void CCPlayer::seek(double pos)
+{
+	demuxer_thread->seek(pos);
 }
 
 } //namespace CCAV

@@ -43,6 +43,11 @@ CCClock::ClockType CCClock::clock_types() const
     return clock_type;
 }
 
+bool CCClock::is_active() const
+{
+	return clock_type == AudioClock;
+}
+
 void CCClock::set_clock_auto(bool a)
 {
     auto_clock = a;
