@@ -51,8 +51,10 @@ CCDemuxer::~CCDemuxer()
 bool CCDemuxer::read_frame()
 {
 	std::unique_lock<std::mutex> lock(mutex_);
-    AVPacket packet;
-    int ret = av_read_frame(format_context, &packet); 
+   // AVPacket packet;
+	std::unique_ptr<AVPacket, std::function<void(AVPacket*)>> packet(
+		new AVPacket, [](AVPacket* p){ av_free_packet(p); delete p; });
+    int ret = av_read_frame(format_context, packet.get()); 
 
     if (ret != 0) {
         if (ret == AVERROR_EOF) {
@@ -68,7 +70,7 @@ bool CCDemuxer::read_frame()
         return false;
     }
 
-    stream_idx = packet.stream_index; 
+    stream_idx = packet->stream_index; 
     if (!started_ && v_codec_context && v_codec_context->frame_number == 0) {
         started_ = true;  
     } else if (!started_ && a_codec_context && a_codec_context->frame_number == 0) {
@@ -79,12 +81,12 @@ bool CCDemuxer::read_frame()
         return false;
     }
 	
-	pkt->date = ByteArray(packet.data, packet.size);
-    pkt->duration = packet.duration;
-    if (packet.dts != AV_NOPTS_VALUE) //has B-frames
-        pkt->pts = packet.dts;
-    else if (packet.pts != AV_NOPTS_VALUE)
-        pkt->pts = packet.pts;
+	pkt->date = ByteArray(packet->data, packet->size);
+    pkt->duration = packet->duration;
+    if (packet->dts != AV_NOPTS_VALUE) //has B-frames
+        pkt->pts = packet->dts;
+    else if (packet->pts != AV_NOPTS_VALUE)
+        pkt->pts = packet->pts;
     else
         pkt->pts = 0;
 
@@ -92,15 +94,15 @@ bool CCDemuxer::read_frame()
     pkt->pts *= av_q2d(stream->time_base);
 
     if (stream->codec->codec_type == AVMEDIA_TYPE_SUBTITLE
-            && (packet.flags & AV_PKT_FLAG_KEY)
-            &&  packet.convergence_duration != AV_NOPTS_VALUE)
-        pkt->duration = packet.convergence_duration * av_q2d(stream->time_base);
-    else if (packet.duration > 0)
-        pkt->duration = packet.duration * av_q2d(stream->time_base);
+            && (packet->flags & AV_PKT_FLAG_KEY)
+            &&  packet->convergence_duration != AV_NOPTS_VALUE)
+        pkt->duration = packet->convergence_duration * av_q2d(stream->time_base);
+    else if (packet->duration > 0)
+        pkt->duration = packet->duration * av_q2d(stream->time_base);
     else
         pkt->duration = 0;
 
-    av_free_packet(&packet); 
+    //av_free_packet(&packet); 
     return true;
 }
 
@@ -184,6 +186,13 @@ void CCDemuxer::seek(double q)
     if (ret < 0) {
         return;
     }
+
+	if (q == 0) {//rp
+		qDebug("************seek to nullptr*********************. started = false");
+		started_ = false;
+		v_codec_context->frame_number = 0; 
+	}
+
     if (master_clock) {
         master_clock->update_value(double(t)/double(AV_TIME_BASE));
         master_clock->update_external_clock(t/1000LL); 
@@ -377,12 +386,11 @@ double CCDemuxer::frame_rate() const
 {
     AVStream *stream = format_context->streams[video_streams()];
     return (double)stream->r_frame_rate.num / (double)stream->r_frame_rate.den;
-    //codecCtx->time_base.den / codecCtx->time_base.num
 }
 
 long long CCDemuxer::frames() const
 {
-    return format_context->streams[video_streams()]->nb_frames; //0?
+    return format_context->streams[video_streams()]->nb_frames; 
 }
 
 bool CCDemuxer::is_input() const
@@ -392,7 +400,7 @@ bool CCDemuxer::is_input() const
 
 int CCDemuxer::audio_streams() const
 {
-    if (audio_stream != -2) //-2: not parsed, -1 not found.
+    if (audio_stream != -2) 
         return audio_stream;
     audio_stream = -1;
     for(unsigned int i=0; i<format_context->nb_streams; ++i) {

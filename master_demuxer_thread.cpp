@@ -140,7 +140,7 @@ void CCDemuxerThread::pause(bool p)
 		full_.notify_all();
 }
 
-void CCDemuxerThread::runEnd()
+void CCDemuxerThread::run_end()
 {
 	end_ = false;
 	while (!end_)
@@ -154,7 +154,7 @@ void CCDemuxerThread::runEnd()
 	qDebug("DemuxSTOP thread stops running....");
 }
 
-void CCDemuxerThread::runDemuxer()
+void CCDemuxerThread::run_demuxer()
 {
 	end = false;
 
@@ -174,7 +174,7 @@ void CCDemuxerThread::runDemuxer()
 	demuxer->started_ = true;
 	while (!end) {
 		if (try_pause())
-			continue; //the queue is empty and will block
+			continue; 
 
 		mutex_.lock();
 		if (!demuxer->read_frame()) {
@@ -199,6 +199,8 @@ void CCDemuxerThread::runDemuxer()
 		}
 	
 	}
+	aqueue->put(PacketData());
+	vqueue->put(PacketData());
 	qDebug("Demux thread stops running....");
 }
 
