@@ -40,11 +40,11 @@ CCWidgetRenderer::~CCWidgetRenderer()
 {
 }
 
-void CCWidgetRenderer::registerEventFilter(EventFilter *filter)
-{
-    d_func().event_filter = filter;
-    installEventFilter(filter);
-}
+// void CCWidgetRenderer::registerEventFilter(EventFilter *filter)
+// {
+//     d_func().event_filter = filter;
+//     installEventFilter(filter);
+// }
 
 bool CCWidgetRenderer::write()
 {
@@ -118,6 +118,11 @@ void CCWidgetRenderer::mouseDoubleClickEvent(QMouseEvent *)
 void CCWidgetRenderer::paintEvent(QPaintEvent *)
 {
     DPTR_D(CCWidgetRenderer);
+
+	if (!d.scale_in) {
+		d.mutex_.lock();
+	}
+
     QPainter p(this);
     if (!d.image.isNull()) {
         if (d.image.size() == QSize(d.width, d.height))
@@ -134,6 +139,10 @@ void CCWidgetRenderer::paintEvent(QPaintEvent *)
         d.preview.fill(QColor(Qt::black));
         p.drawImage(QPoint(), d.preview);
     }
+
+	if (!d.scale_in) {
+		d.mutex_.unlock();
+	}
 }
 
 void CCWidgetRenderer::dragEnterEvent(QDragEnterEvent *)

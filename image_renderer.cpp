@@ -43,11 +43,30 @@ QImage CCImageRenderer::current_frame_image() const
 void CCImageRenderer::convert_data(const ByteArray &data)
 {
 	DPTR_D(CCImageRenderer);
+	if (!d.scale_in) {
+		/*if lock is required, do not use locker in if() scope, it will unlock outside the scope*/
+		d.mutex_.lock();
+		//qDebug("data address = %p, %p", data.data(), d.data.data());
 #if QT_VERSION >= QT_VERSION_CHECK(4, 0, 0)
-	d.image = *&QImage((uchar*)data.data(), d.src_width, d.src_height, QImage::Format_RGB32);
+		d.image = *&QImage((uchar*)data.data(), d.src_width, d.src_height, QImage::Format_RGB32);
 #else
-	d.image = QImage((uchar*)data.data(), d.src_width, d.src_height, 16, NULL, 0, QImage::IgnoreEndian);
+		d.image = QImage((uchar*)d.data.data(), d.src_width, d.src_height, 16, NULL, 0, QImage::IgnoreEndian);
 #endif
+		d.mutex_.unlock();
+	}
+	else {
+		//qDebug("data address = %p", data.data());
+#if QT_VERSION >= QT_VERSION_CHECK(4, 0, 0)
+		d.image = *&QImage((uchar*)data.data(), d.src_width, d.src_height, QImage::Format_RGB32);
+#else
+		d.image = QImage((uchar*)data.data(), d.src_width, d.src_height, 16, NULL, 0, QImage::IgnoreEndian);
+#endif
+	}
+// #if QT_VERSION >= QT_VERSION_CHECK(4, 0, 0)
+// 	d.image = *&QImage((uchar*)data.data(), d.src_width, d.src_height, QImage::Format_RGB32);
+// #else
+// 	d.image = QImage((uchar*)data.data(), d.src_width, d.src_height, 16, NULL, 0, QImage::IgnoreEndian);
+// #endif
 }
 
 

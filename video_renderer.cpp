@@ -38,6 +38,38 @@ CCVideoRenderer::~CCVideoRenderer()
 {
 }
 
+void CCVideoRenderer::scale_in(bool q)
+{
+	d_func().scale_in = q;
+}
+
+bool CCVideoRenderer::scale_in() const
+{
+	return d_func().scale_in;
+}
+
+void CCVideoRenderer::set_source_size(const QSize& s)
+{
+	set_source_size(s.width(), s.height());
+}
+
+QSize CCVideoRenderer::last_size() const
+{
+	DPTR_D(const CCVideoRenderer);
+	return QSize(d.src_width, d.src_height);
+}
+
+int CCVideoRenderer::last_width() const
+{
+	DPTR_D(const CCVideoRenderer);
+	return d.src_width;
+}
+int CCVideoRenderer::last_height() const
+{
+	DPTR_D(const CCVideoRenderer);
+	return  d.src_height;
+}
+
 void CCVideoRenderer::set_source_size(int width, int height)
 {
     DPTR_D(CCVideoRenderer);
@@ -47,8 +79,10 @@ void CCVideoRenderer::set_source_size(int width, int height)
 
 void CCVideoRenderer::registerEventFilter(EventFilter *filter)
 {
-    d_func().event_filter = filter;
-    qApp->installEventFilter(filter);
+	DPTR_D(CCVideoRenderer);
+	qApp->removeEventFilter(d.event_filter);
+	d.event_filter = filter;
+	qApp->installEventFilter(filter);
 }
 
 bool CCVideoRenderer::open()

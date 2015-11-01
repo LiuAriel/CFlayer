@@ -62,9 +62,16 @@ bool CCImageConverterFF::convert(const quint8 *const srcSlice[], const int srcSt
         return false;
 
     int result_h = sws_scale(d.sws_ctx, srcSlice, srcStride, 0, d.h_in, d.picture.data, d.picture.linesize);
-    if (is_interlaced()) {
+	
+	if (result_h != d.h_out) {
+		qDebug("convert failed: %d, %d", result_h, d.h_out);
+		return false;
+	}
+
+	if (is_interlaced()) {
         avpicture_deinterlace(&d.picture, &d.picture, (PixelFormat)d.fmt_out, d.w_out, d.h_out);
     }
+
     Q_UNUSED(result_h);
     return true;
 }
@@ -73,9 +80,9 @@ bool CCImageConverterFF::prepare_data()
 {
 	DPTR_D(CCImageConverterFF);
 	int bytes = avpicture_get_size((PixelFormat)d.fmt_out, d.w_out, d.h_out);
-	if (d.data_outs.size() < bytes) {
+	//if (d.data_outs.size() < bytes) {
 		d.data_outs.resize(bytes);
-	}
+	//}
 	
 	avpicture_fill(
 		&d.picture,

@@ -38,14 +38,25 @@ ByteArray CCImageConverter::out_data() const
 
 void CCImageConverter::set_in_size(int width, int height)
 {
-    d_func().w_in = width;
-    d_func().h_in = height;
+	DPTR_D(CCImageConverter);
+	if (d.w_in == width && d.h_in == height)
+		return;
+
+    d.w_in = width;
+    d.h_in = height;
+
+	prepare_data();
 }
 
 void CCImageConverter::set_out_size(int width, int height)
 {
-    d_func().w_out = width;
-    d_func().h_out = height;
+	DPTR_D(CCImageConverter);
+	if (d.w_out == width && d.h_out == height)
+		return;
+
+	d.w_out = width;
+	d.h_out = height;
+
 	prepare_data();
 }
 
