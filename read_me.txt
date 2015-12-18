@@ -1,7 +1,6 @@
 CFlayer：媒体播放库基于C/C++11和FFmpeg（2.1.3版本）
 目前移植的Android版本已经发布（c++11 + SDL2（渲染） + ffmpeg （2.8.3_neon）+OpenAL（声音） + java （UI）= Android播放器）
-github：
-https://github.com/juno52wendy/CCAV_Android
+github：https://github.com/juno52wendy/CCAV_Android
 目前播放器1.1.2版本；release文件提供exe测试文件；
 
 CFlayer操作平台：暂时只提供WIN7以上操作系统测试文件。
