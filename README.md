@@ -24,7 +24,10 @@ CFlayer操作平台：暂时只提供WIN7以上操作系统测试文件。
 按键盘左，右箭头键，快进与后退;                                                                                              
 按“S”是停止;                                                                                                                 
 按“T”是置顶窗口;                                                                                                            
-按键盘向上和向下箭头键来改变音量。                                                                                          
+按键盘向上和向下箭头键来改变音量。
+
+项目效果截图可暂时进入博客查看：
+http://my.oschina.net/klttl/blog/546950
 
 CFlayer:  Media play library based on c/c++ and FFmpeg
 
