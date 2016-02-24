@@ -28,8 +28,6 @@ CFlayer操作平台：暂时只提供WIN7以上操作系统测试文件。
 
 由于网络问题，暂时不能更新最新代码；
 
-项目效果截图可暂时进入博客查看：
-http://my.oschina.net/klttl/blog/546950
 
 CFlayer:  Media play library based on c/c++ and FFmpeg
 
